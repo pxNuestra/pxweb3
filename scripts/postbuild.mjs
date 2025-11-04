@@ -3,9 +3,9 @@ import rss from './rss.mjs'
 async function postbuild() {
   try {
     await rss()
-    console.log('✅ RSS generated successfully')
+    console.log('✅ Postbuild: RSS generation completed')
   } catch (err) {
-    console.warn('⚠️ RSS generation skipped:', err.message)
+    console.warn('⚠️ Postbuild: RSS generation skipped:', err.message)
   }
 }
 
