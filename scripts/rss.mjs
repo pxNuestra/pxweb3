@@ -2,7 +2,7 @@ import { writeFileSync, mkdirSync } from 'fs'
 import path from 'path'
 import GithubSlugger from 'github-slugger'
 import siteMetadata from '../src/data/config.js'
-import { allBlogs } from '../.contentlayer/generated/index.mjs'
+const allBlogs = [] // sementara kosong karena MDX dihapus
 
 const slugger = new GithubSlugger()
 
