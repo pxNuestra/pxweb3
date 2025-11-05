@@ -1,9 +1,8 @@
-// postcss.config.js (Proposed Fix 1)
+// postcss.config.js (Proposed Fix 2)
 
-// REMOVE: /** @type {import('postcss-load-config').Config} */
 module.exports = {
-  plugins: {
-    tailwindcss: {},
-    autoprefixer: {},
-  },
+  plugins: [
+    'tailwindcss',
+    'autoprefixer'
+  ],
 }
