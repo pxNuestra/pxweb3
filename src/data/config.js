@@ -4,10 +4,10 @@ const config = {
   description: 'This is Muhammad F. Nuestra personal website',
   siteURL: 'https://nuestra.xd/',
   language: 'en-us',
-  email: 'cyberaioff@gmail.com',
+  email: 'nuestraxd4412@gmail.com',
   locale: 'en-US',
   socialBanner: '/images/twitter-card.png',
-  repo: 'https://github.com/DemuraAIdev/deweb3',
+  repo: 'https://github.com/pxNuestra/pxweb3',
   analytics: {
     umami: {
       websiteId: '53d258db-c042-4355-8f0f-3c51617c3ef2',
@@ -20,4 +20,5 @@ const config = {
   },
 }
 
-module.exports = config
+export const analytics = config.analytics
+export default config

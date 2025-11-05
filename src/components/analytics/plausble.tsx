@@ -1,6 +1,9 @@
 import Script from 'next/script'
 
-import { analytics } from '@/data/config'
+import config from '@/data/config'
+
+const { analytics } = config
+
 
 const PlausibleScript = () => {
   return (

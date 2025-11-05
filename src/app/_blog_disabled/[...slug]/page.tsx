@@ -44,29 +44,29 @@ const dummyAuthor = {
 const allBlogs = [dummyPost]
 const allAuthors = [dummyAuthor]
 
-// ================================================
+// =====================================================
 
 export async function generateMetadata({
   params,
 }: {
   params: { slug: string[] }
 }): Promise<Metadata | undefined> {
-  const slug = decodeURI(params.slug.join('/'))
-  const post = allBlogs.find((p) => p.slug === slug) || dummyPost
-const authorDetails = post.authors.map(() => dummyAuthor)
- 
-  const publishedAt = new Date(post.date).toISOString()
-  const modifiedAt = new Date(post.lastmod || post.date).toISOString()
+  const slug = decodeURI(params?.slug?.join('/') || '')
+  const post = allBlogs.find((p) => p?.slug === slug) || dummyPost
+  const authorDetails = post.authors.map(() => dummyAuthor)
+
+  const publishedAt = new Date(post.date || new Date()).toISOString()
+  const modifiedAt = new Date(post.lastmod || post.date || new Date()).toISOString()
   const authors = authorDetails.map((author) => author.name)
-  const imageList = post.images
-    ? typeof post.images === 'string'
-      ? [post.images]
-      : post.images
-    : [siteMetadata.socialBanner]
+  const imageList =
+    post.images && post.images.length
+      ? typeof post.images === 'string'
+        ? [post.images]
+        : post.images
+      : [siteMetadata.socialBanner]
 
   const ogImages = imageList.map((img) => ({ url: img }))
 
-  // Buat JSON-LD baru agar tidak error
   const jsonLdWithAuthor = {
     ...post.structuredData,
     author: authorDetails.map((author) => ({
@@ -100,24 +100,44 @@ const authorDetails = post.authors.map(() => dummyAuthor)
 }
 
 export const generateStaticParams = async () => {
-  return allBlogs.map((p) => ({ slug: p.slug.split('/') }))
+  if (!allBlogs || allBlogs.length === 0) {
+    console.warn('⚠️ allBlogs kosong, tidak ada params yang dihasilkan')
+    return []
+  }
+
+  return allBlogs
+    .filter((p) => typeof p?.slug === 'string' && p.slug.trim() !== '')
+    .map((p) => ({
+      slug: p.slug?.split?.('/') ?? [],
+    }))
 }
 
-export default async function Page({ params }: { params: { slug: string[] } }) {
-  const slug = decodeURI(params.slug.join('/'))
-  const sortedCoreContents = allCoreContent(sortPosts(allBlogs))
-  const postIndex = sortedCoreContents.findIndex((p) => p.slug === slug)
+// =====================================================
 
-  if (postIndex === -1) {
+export default async function Page({ params }: { params: { slug: string[] } }) {
+const slug = Array.isArray(params?.slug)
+  ? decodeURI(params.slug.join('/'))
+  : typeof params?.slug === 'string'
+  ? decodeURI(params.slug)
+  : ''
+  if (!slug) {
+    console.error('❌ Slug kosong di params')
     return notFound()
   }
 
-  const post = allBlogs.find((p) => p.slug === slug) || dummyPost
-const authorDetails = post.authors.map(() => dummyAuthor)
+  const validBlogs = allBlogs.filter((b) => typeof b?.slug === 'string')
+  const sortedCoreContents = allCoreContent(sortPosts(validBlogs))
+  const postIndex = sortedCoreContents.findIndex((p) => p.slug === slug)
 
+  if (postIndex === -1) {
+    console.error(`⚠️ Post dengan slug "${slug}" tidak ditemukan`)
+    return notFound()
+  }
+
+  const post = validBlogs.find((p) => p.slug === slug) || dummyPost
+  const authorDetails = post.authors.map(() => dummyAuthor)
   const mainContent = coreContent(post)
 
-  // JSON-LD baru
   const jsonLdWithAuthor = {
     ...post.structuredData,
     author: authorDetails.map((author) => ({
