@@ -1,17 +1,21 @@
-import { omit } from 'contentlayer/utils'
-import type { Document, MDX } from 'contentlayer/core'
 const isProduction = process.env.NODE_ENV === 'production'
-export type MDXDocument = Document & { body: MDX }
-export type MDXDocumentDate = MDXDocument & {
-  date: string
-}
-export type MDXBlog = MDXDocumentDate & {
-  tags?: string[]
-  draft?: boolean
-}
 
-export type MDXAuthor = MDXDocument & {
-  name: string
+export type MDX = any
+export type Document = Record<string, any>
+
+export type MDXDocument = Document & { body: MDX }
+export type MDXDocumentDate = MDXDocument & { date: string }
+export type MDXBlog = MDXDocumentDate & { tags?: string[]; draft?: boolean }
+
+export type MDXAuthor = MDXDocument & { name: string }
+
+// fungsi omit sederhana
+export function omit<T extends object, K extends keyof T>(obj: T, keys: K[]): Omit<T, K> {
+  const result = { ...obj }
+  keys.forEach((key) => {
+    delete result[key]
+  })
+  return result
 }
 
 export function dateSortDesc(a: string, b: string) {

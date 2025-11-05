@@ -1,27 +1,37 @@
 import { genPageMetadata } from '../seo'
-
 import Image from '@/components/Image'
-import { coreContent } from '@/lib/utils'
-import { Authors, allAuthors } from 'contentlayer/generated'
 import { GoPersonFill } from 'react-icons/go'
 
-const author = allAuthors.find((p) => p.slug === 'default') as Authors
-const mainContent = coreContent(author)
+const dummyAuthor = {
+  name: 'Muhammad "Nuestra" Fasya',
+  avatar: '/images/MFasya.jpg',
+  occupation: 'Website Developer, Bot Developer, Graphic Designer',
+  company: '',
+  email: 'example@email.com',
+  twitter: '',
+  linkedin: '',
+  github: '',
+  // Tambahkan field lain yang diperlukan coreContent jika ada
+}
+
+const mainContent = dummyAuthor
+
 export const metadata = genPageMetadata({ title: 'About' })
+
 export default function Home() {
   const { name, avatar, occupation, company, email, twitter, linkedin, github } = mainContent
   return (
     <>
       <div className="space-y-2 pb-8 pt-6 md:space-y-5">
-        <h1 className="text-4xl font-bold  tracking-tight text-gray-900 dark:text-gray-100">
+        <h1 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
           About <GoPersonFill className="inline-block" />
         </h1>
       </div>
       <div className="items-start">
         <div className="mb-2">
           <Image
-            src={'/images/MFasya.jpg'}
-            alt={'count'}
+            src={avatar}
+            alt={name}
             width={200}
             height={200}
             unoptimized
@@ -29,7 +39,7 @@ export default function Home() {
           />
         </div>
         <div className="sticky mt-4 text-center">
-          <h2 className="text-2xl font-semibold">Muhammad "Nuestra" Fasya</h2>
+          <h2 className="text-2xl font-semibold">{name}</h2>
         </div>
         <div className={`prose font-sans dark:prose-dark xl:col-span-2`}>
           {/* Converted MDX -> static HTML because Vercel does not support MDX at runtime */}

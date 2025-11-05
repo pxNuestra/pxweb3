@@ -1,16 +1,50 @@
 import './prism.css'
 import 'katex/dist/katex.css'
 
-// import PageTitle from '@/components/PageTitle'
 import { components } from '@/components/MDXComponents'
 import { MDXRender } from '@/lib/MDXRender'
 import { sortPosts, coreContent, allCoreContent } from '@/lib/utils'
-import { allBlogs, allAuthors } from 'contentlayer/generated'
-import type { Authors, Blog } from 'contentlayer/generated'
 import PostLayout from './PostLayout'
 import { Metadata } from 'next'
 import siteMetadata from '@/data/config'
 import { notFound } from 'next/navigation'
+
+const dummyPost = {
+  slug: 'example-post',
+  title: 'Example Post',
+  summary: 'This is an example post summary.',
+  date: new Date().toISOString(),
+  lastmod: new Date().toISOString(),
+  authors: ['default'],
+  images: ['/images/default-banner.jpg'],
+  body: {
+    code: '<p>This is a sample post content.</p>',
+  },
+  toc: [],
+  structuredData: {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: 'Example Post',
+    datePublished: new Date().toISOString(),
+    dateModified: new Date().toISOString(),
+  },
+}
+
+const dummyAuthor = {
+  name: 'Muhammad "Nuestra" Fasya',
+  avatar: '/images/MFasya.jpg',
+  occupation: 'Website Developer, Bot Developer, Graphic Designer',
+  company: '',
+  email: 'example@email.com',
+  twitter: '',
+  linkedin: '',
+  github: '',
+}
+
+const allBlogs = [dummyPost]
+const allAuthors = [dummyAuthor]
+
+// ================================================
 
 export async function generateMetadata({
   params,
@@ -18,28 +52,28 @@ export async function generateMetadata({
   params: { slug: string[] }
 }): Promise<Metadata | undefined> {
   const slug = decodeURI(params.slug.join('/'))
-  const post = allBlogs.find((p) => p.slug === slug)
-  const authorList = post?.authors || ['default']
-  const authorDetails = authorList.map((author) => {
-    const authorResults = allAuthors.find((p) => p.slug === author)
-    return coreContent(authorResults as Authors)
-  })
-  if (!post) {
-    return
-  }
-
+  const post = allBlogs.find((p) => p.slug === slug) || dummyPost
+const authorDetails = post.authors.map(() => dummyAuthor)
+ 
   const publishedAt = new Date(post.date).toISOString()
   const modifiedAt = new Date(post.lastmod || post.date).toISOString()
   const authors = authorDetails.map((author) => author.name)
-  let imageList = [siteMetadata.socialBanner]
-  if (post.images) {
-    imageList = typeof post.images === 'string' ? [post.images] : post.images
+  const imageList = post.images
+    ? typeof post.images === 'string'
+      ? [post.images]
+      : post.images
+    : [siteMetadata.socialBanner]
+
+  const ogImages = imageList.map((img) => ({ url: img }))
+
+  // Buat JSON-LD baru agar tidak error
+  const jsonLdWithAuthor = {
+    ...post.structuredData,
+    author: authorDetails.map((author) => ({
+      '@type': 'Person',
+      name: author.name,
+    })),
   }
-  const ogImages = imageList.map((img) => {
-    return {
-      url: img,
-    }
-  })
 
   return {
     title: post.title,
@@ -66,39 +100,37 @@ export async function generateMetadata({
 }
 
 export const generateStaticParams = async () => {
-  const paths = allBlogs.map((p) => ({ slug: p.slug.split('/') }))
-
-  return paths
+  return allBlogs.map((p) => ({ slug: p.slug.split('/') }))
 }
 
 export default async function Page({ params }: { params: { slug: string[] } }) {
   const slug = decodeURI(params.slug.join('/'))
-  // Filter out drafts in production
   const sortedCoreContents = allCoreContent(sortPosts(allBlogs))
   const postIndex = sortedCoreContents.findIndex((p) => p.slug === slug)
+
   if (postIndex === -1) {
     return notFound()
   }
-  const post = allBlogs.find((p) => p.slug === slug) as Blog
-  const authorList = post?.authors || ['default']
-  const authorDetails = authorList.map((author) => {
-    const authorResults = allAuthors.find((p) => p.slug === author)
-    return coreContent(authorResults as Authors)
-  })
+
+  const post = allBlogs.find((p) => p.slug === slug) || dummyPost
+const authorDetails = post.authors.map(() => dummyAuthor)
+
   const mainContent = coreContent(post)
-  const jsonLd = post.structuredData
-  jsonLd['author'] = authorDetails.map((author) => {
-    return {
+
+  // JSON-LD baru
+  const jsonLdWithAuthor = {
+    ...post.structuredData,
+    author: authorDetails.map((author) => ({
       '@type': 'Person',
       name: author.name,
-    }
-  })
+    })),
+  }
 
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdWithAuthor) }}
       />
       <PostLayout content={mainContent} authorDetails={authorDetails}>
         <MDXRender code={post.body.code} components={components} toc={post.toc} />

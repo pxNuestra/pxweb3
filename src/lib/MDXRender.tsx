@@ -21,8 +21,6 @@ const getMDXComponent = (
 }
 
 // TS transpile it to a require which causes ESM error
-// Copying the function from contentlayer as a workaround
-// Copy of https://github.com/contentlayerdev/contentlayer/blob/main/packages/next-contentlayer/src/hooks/useMDXComponent.ts
 export const useMDXComponent = (
   code: string,
   globals: Record<string, unknown> = {}

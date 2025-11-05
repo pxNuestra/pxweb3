@@ -1,13 +1,12 @@
 import { ReactNode } from 'react'
 import { CoreContent } from '@/lib/utils'
-import type { Blog, Authors } from 'contentlayer/generated'
 // import Comments from '@/components/Comments'
 import siteMetadata from '@/data/config'
 import ScrollTopAndComment from '@/components/ScrollTop'
 
-// const editUrl = (path) => `${siteMetadata.siteRepo}/blob/main/data/${path}`
-// const discussUrl = (path) =>
-//   `https://mobile.twitter.com/search?q=${encodeURIComponent(`${siteMetadata.siteUrl}/${path}`)}`
+// Dummy tipe untuk menggantikan Blog & Authors
+type BlogType = any
+type AuthorsType = any
 
 const postDateTemplate: Intl.DateTimeFormatOptions = {
   weekday: 'long',
@@ -17,8 +16,8 @@ const postDateTemplate: Intl.DateTimeFormatOptions = {
 }
 
 interface LayoutProps {
-  content: CoreContent<Blog>
-  authorDetails: CoreContent<Authors>[]
+  content: CoreContent<BlogType>
+  authorDetails: CoreContent<AuthorsType>[]
   next?: { path: string; title: string }
   prev?: { path: string; title: string }
   children: ReactNode
@@ -51,7 +50,7 @@ export default function PostLayout({ content, authorDetails, next, prev, childre
                     </dd>
                   </div>
                 </dl>
-                <div className="text-gray-500 dark:text-gray-400">{readingTime.text}</div>
+                <div className="text-gray-500 dark:text-gray-400">{readingTime?.text}</div>
               </div>
             </div>
           </header>
